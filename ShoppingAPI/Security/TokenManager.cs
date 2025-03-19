@@ -52,5 +52,25 @@ namespace Shopping.API.Security
             //    new Claim("", ""),
             //];
         }
+
+        public int ValidateTokenWithoutLifeTime(string token)
+        {
+            JwtSecurityTokenHandler handler = new();
+            TokenValidationParameters validationParameters = new()
+            {
+                ValidateIssuer = true,
+                ValidIssuer = config.Issuer,
+                ValidateAudience = true,
+                ValidAudience = config.Audience,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey 
+                    = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.Secret)),
+                // IL NE FAUT PAS VALIDER LA DUREE DE VIE !!!
+                ValidateLifetime = false,
+            };
+
+            var result = handler.ValidateToken(token, validationParameters, out SecurityToken s);
+            return int.Parse(result?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "-1");
+        }
     }
 }

@@ -44,5 +44,25 @@ namespace Shopping.API.Controllers
                 Token = tokenManager.CreateToken(user.Id, user.Email, user.Role)
             });
         }
+
+        [HttpGet]
+        public IActionResult RefreshToken([FromQuery]string token)
+        {
+            try
+            {
+                int id = tokenManager.ValidateTokenWithoutLifeTime(token);
+                User? user = context.Users.Find(id);
+                if (user is null)
+                {
+                    return Unauthorized();
+                }
+                string newToken = tokenManager.CreateToken(user.Id, user.Email, user.Role);
+                return Ok(new { Token = newToken });
+            }
+            catch (Exception ex) {
+                return Unauthorized();
+            }
+            
+        }
     }
 }

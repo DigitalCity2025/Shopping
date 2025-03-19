@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using Shopping.DAL;
 using Shopping.DAL.Entities;
 
@@ -7,15 +9,19 @@ namespace Shopping.API.Controllers
 
     [ApiController]
     [Route("api/[controller]")]
+    // authorisation globale sur toutes les routes du controller
+    //[Authorize(Roles = "Admin,Noob")]
     public class ArticleController(ShoppingContext context) : ControllerBase
     {
         [HttpGet]
+        [Authorize] // doit etre authentifier peut importe le role
         public IActionResult Get()
         {
             return Ok(context.Articles.ToList()); // 200
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")] // doit avoir le role admin
         public IActionResult Post([FromBody] Article article)
         {
             context.Articles.Add(article);
@@ -24,6 +30,7 @@ namespace Shopping.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete([FromRoute]int id)
         {
             Article? articleToDelete = context.Articles.Find(id);
@@ -37,6 +44,7 @@ namespace Shopping.API.Controllers
         }
 
         [HttpDelete("all")]
+        [Authorize(Roles = "Admin")]
         public IActionResult DeleteAll()
         {
             context.Articles.RemoveRange(context.Articles.ToList());
