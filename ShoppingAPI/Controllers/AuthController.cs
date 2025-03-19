@@ -45,7 +45,7 @@ namespace Shopping.API.Controllers
             });
         }
 
-        [HttpGet]
+        [HttpGet("refreshToken")]
         public IActionResult RefreshToken([FromQuery]string token)
         {
             try
@@ -59,7 +59,7 @@ namespace Shopping.API.Controllers
                 string newToken = tokenManager.CreateToken(user.Id, user.Email, user.Role);
                 return Ok(new { Token = newToken });
             }
-            catch (Exception ex) {
+            catch (Exception) {
                 return Unauthorized();
             }
             
